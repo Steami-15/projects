@@ -16,7 +16,8 @@ pop = pygame.mixer.Sound("pop2.mp3")
 # Starting settings
 current_color = RED
 current_shape = "triangle"
-SHAPE_SIZE = 40
+SHAPE_SIZE = 20
+radius = 20
 pygame.mixer.music.load("instrumental.mp3")
 pygame.mixer.music.play(-1)
 # List of shapes (each shape is: [x, y, size, color, type])
@@ -43,6 +44,10 @@ while running:
                 current_shape = "hexagon"  # Select hexagon
             elif event.key == pygame.K_3:
                 current_shape = "triangle"  # Select triangle
+            elif event.key == pygame.K_4:
+                current_shape = "circle"
+            elif event.key == pygame.K_5:
+                current_shape = "square"
                 
             #letters select what color to draw with
             if event.key == pygame.K_r:
@@ -87,6 +92,16 @@ while running:
                 (x - size, y - size // 2)   # Top-left
             ]
             pygame.draw.polygon(screen, color, points)
+        elif kind == "square":
+            points = [
+                
+                (x + size, y - size // 2),  # Top-right
+                (x + size, y + size // 8),  # Bottom-right
+                
+                (x - size, y + size // 8),  # Bottom-left
+                (x - size, y - size // 2)   # Top-left
+            ]
+            pygame.draw.polygon(screen, color, points)
         elif kind == "triangle":
             points = [
                 (x, y - size),           # Top point
@@ -94,10 +109,12 @@ while running:
                 (x + size, y + size)     # Bottom-right point
             ]
             pygame.draw.polygon(screen, color, points)
+        elif kind == "circle":
+            pygame.draw.circle(screen, color, (x, y), 20)
         
 
     # Display instructions at the top
-    instructions = font.render("1: Ellipse  2: Hexagon  3: Triangle", True, BLACK)
+    instructions = font.render("1: Ellipse  2: Hexagon  3: Triangle 4: Circle 5: Square", True, BLACK)
     instructions2 = font.render ("R: Red  G: Green  B: Brown W: White P: Dark Blue Y: Yellow", True, BLACK)
     screen.blit(instructions, (10, 0))
     screen.blit(instructions2, (10, 50))

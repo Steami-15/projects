@@ -13,6 +13,8 @@ string inventory[5]; // inventory
 
 string perks[4];
 
+string done = "end";
+
 void PerkShop();
 
 bool JGactive = false;
@@ -32,9 +34,9 @@ int main() {
 	string input = "skibidi";
 	bool room5 = false;
 	bool grabcoins = false;
+	bool neighbor = false;
 
-
-	while (input != "quit" && 0 < health) {
+	while (done != "quit" && input != "quit" && 0 < health) {
 
 		cout << endl << "--------------" << endl;
 		cout << "your inventory: ";
@@ -52,7 +54,7 @@ int main() {
 
 		switch (room) {
 		case 1:
-			cout << "you are in your hotel room that you started living in for a year and a zombie outbreak starts and you need to get gearedup in this hotel floor you are on. You see a key on the table next to your bed type q to grab. You can go east to leave" << endl << endl << endl;
+			cout << "you are in your hotel room that you started living in for a year and a zombie outbreak starts and you need to get gearedup in this hotel floor you are on you hear zombies growling but you are brave. You see a key on the table next to your bed type q to grab. You can go east to leave" << endl << endl << endl;
 			if (grabcoins == false) {
 				cout << "you found some coins" << endl;
 				coins += 30;
@@ -172,13 +174,18 @@ int main() {
 				cout << "thats not an option" << endl;
 			break;
 		case 9:
-			cout << "you are in your neighbors room there is a stim shot in here do you grab it? north to go back" << endl;
+			if (neighbor == false) {
+				cout << "you found some coins on the floor!" << endl;
+				coins += 10;
+				neighbor = true;
+				cout << "your coins: " << coins << endl << endl;
+			}
+			cout << "you are in your neighbors room north to go back" << endl;
 			cin >> input;
-			if (input == "stim" || input == "yes" || input == "grab" || input.compare("grab stim") == 0)
-				inventory[2] == "neighbor stim";
-				
-			else if (input == "north" || input == "North" || input.compare("go north") == 0 || input.compare("Go north") == 0)
+			if (input == "north" || input == "North" || input.compare("go north") == 0 || input.compare("Go north") == 0)
 				room = 7;
+			else
+				cout << "thats not an option" << endl;
 			break;
 
 		case 10:
@@ -244,7 +251,7 @@ void PerkShop() {
 		case 'd':
 			if (DWactive == false && coins >= 10) {
 				cout << "you have the Dying Wish Perk!" << endl;
-				perks[1] = "DyingWish";
+				perks[2] = "DyingWish";
 				DWactive = true;
 				coins -= 10;
 			}
@@ -257,7 +264,7 @@ void PerkShop() {
 		case 'r':
 			if (DHactive == false && coins >= 10) {
 				cout << "you got Double Hit Root Beer!" << endl;
-				perks[2] = "DoubleHit";
+				perks[1] = "DoubleHit";
 				DHactive = true;
 				coins -= 10;
 			}
@@ -357,18 +364,16 @@ void Horde() {
 	int armoredzombie1 = 60;
 	int input;
 	int num;
+	
+
 	cout << endl << endl << "--------------------------------" << endl << endl;
 	while (health > 0 && zombie1 > 0) {
+		
 
 		//monster attack
 		if (inventory[0] == "armor") {
 			num = rand() % 10 + 10; // range from 10-20
 			cout << "you get hit by zombie for " << num << " damage (reduced because of armor)" << endl << endl;
-			health -= num;
-		}
-		else {
-			num = rand() % 30 + 10; // range from 30-40
-			cout << "you get hit by zombie for " << num << " damage" << endl << endl;
 			health -= num;
 
 			cout << "press 1 to attack, 2 to use stim" << endl << endl;
@@ -377,13 +382,17 @@ void Horde() {
 			switch (input) {
 			case 1:
 				//player attack
-				if (health < 10 && DWactive == true) {
+				if (health < 20 && DWactive == true) {
 					cout << "You passed out for a second but the Dying Wish saved you!" << endl << endl;
 					if (JGactive) {
-						health = 250;
+						health += 100;
+						DWactive = false;
+						perks[2] = " ";
 					}
 					else
-						health = 150;
+						health = 50;
+					DWactive = false;
+					perks[2] = " ";
 				}
 				else if (inventory[1] == "Fire sword" && DHactive == true) {
 					num = rand() % 13 + 15; // range from 10-20
@@ -432,7 +441,117 @@ void Horde() {
 				}
 				break;
 			case 2:
-				if (JGactive == true && inventory[3] == "stim") {
+				if (health < 20 && DWactive == true) {
+					cout << "You passed out for a second but the Dying Wish saved you!" << endl << endl;
+					if (JGactive) {
+						health = 250;
+						DWactive = false;
+						perks[2] = " ";
+					}
+					else
+						health = 150;
+					DWactive = false;
+					perks[2] = " ";
+				}
+				else if (JGactive == true && inventory[3] == "stim") {
+					cout << "you inject the stim and get health!" << endl << endl;
+					health = 250;
+					inventory[3] = " ";
+				}
+				else if (inventory[3] == "stim") {
+					cout << "you inject the stim and get health!" << endl << endl;
+					health = 150;
+					inventory[3] = " "; // erases stim
+				}
+				else cout << "you dont have a stim equipped" << endl << endl;
+				break;
+			}
+			cout << "your health:" << health << endl << endl;
+			cout << "the zombies health is:" << zombie1 << endl << endl;
+		}
+		else {
+			num = rand() % 30 + 10; // range from 30-40
+			cout << "you get hit by zombie for " << num << " damage" << endl << endl;
+			health -= num;
+
+			cout << "press 1 to attack, 2 to use stim" << endl << endl;
+			cin >> input;
+
+			switch (input) {
+			case 1:
+				//player attack
+				if (health < 20 && DWactive == true) {
+					cout << "You passed out for a second but the Dying Wish saved you!" << endl << endl;
+					if (JGactive) {
+						health = 250;
+						DWactive = false;
+						perks[2] = " ";
+					}
+					else
+						health = 150;
+					DWactive = false;
+					perks[2] = " ";
+				}
+				else if (inventory[1] == "Fire sword" && DHactive == true) {
+					num = rand() % 13 + 15; // range from 10-20
+					cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+					zombie1 -= num;
+				}
+				else if (inventory[1] == "Fire sword") {
+					num = rand() % 10 + 10; // range from 10-20
+					cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+					zombie1 -= num;
+				}
+				else if (inventory[1] == "Light sword" && DHactive == true) {
+					num = rand() % 13 + 15; // range from 10-20
+					cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+					zombie1 -= num;
+				}
+				else if (inventory[1] == "Light sword") {
+					num = rand() % 10 + 10; // range from 10-20
+					cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+					zombie1 -= num;
+				}
+				else if (inventory[1] == "Void sword" && DHactive == true) {
+					num = rand() % 15 + 18; // range from 13-28
+					cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+					zombie1 -= num;
+				}
+				else if (inventory[1] == "Void sword") {
+					num = rand() % 15 + 18; // range from 13-28
+					cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+					zombie1 -= num;
+				}
+				else if (inventory[1] == "Electric sword" && DHactive == true) {
+					num = rand() % 13 + 15; // range from 10-20
+					cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+					zombie1 -= num;
+				}
+				else if (inventory[1] == "Electric sword") {
+					num = rand() % 10 + 10; // range from 10-20
+					cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+					zombie1 -= num;
+				}
+				else {
+					num = rand() % 5 + 3;
+					cout << "you punch the zombie for" << num << " damage" << endl << endl;
+					zombie1 -= num;
+				}
+				break;
+			case 2:
+				if (health < 20 && DWactive == true) {
+					cout << "You passed out for a second but the Dying Wish saved you!" << endl << endl;
+					if (JGactive) {
+						health = 250;
+						DWactive = false;
+						perks[2] = " ";
+					}
+					else
+						health = 150;
+					DWactive = false;
+					perks[2] = " ";
+				}
+				else if (JGactive == true && inventory[3] == "stim") {
 					cout << "you inject the stim and get health!" << endl << endl;
 					health = 250;
 					inventory[3] = " ";
@@ -449,33 +568,131 @@ void Horde() {
 			cout << "the zombies health is:" << zombie1 << endl << endl;
 		}
 
-		if (zombie1 <= 0)
+		if (zombie1 <= 0) {
 			while (health > 0 && zombie2 > 0) {
+				cout << "----------------------" << endl;
 				cout << "The next zombie charges at you!" << endl << endl;
 				//monster attack
 				if (inventory[0] == "armor") {
-					num = rand() % 10 + 10; // range from 10-20
+					num = rand() % 15 + 10; // range from 10-20
 					cout << "you get hit by zombie for " << num << " damage (reduced because of armor)" << endl << endl;
 					health -= num;
-				}
-				else {
-					num = rand() % 30 + 10; // range from 30-40
-					cout << "you get hit by zombie for " << num << " damage" << endl << endl;
-					health -= num;
 
-					cout << "press 1 to attack, 2 to use stim, 3 to try to escape" << endl << endl;
+					cout << "press 1 to attack, 2 to use stim" << endl << endl;
 					cin >> input;
 
 					switch (input) {
 					case 1:
 						//player attack
-						if (health < 10 && DWactive == true) {
+						if (health < 20 && DWactive == true) {
 							cout << "You passed out for a second but the Dying Wish saved you!" << endl << endl;
 							if (JGactive) {
 								health = 250;
+								DWactive = false;
+								perks[2] = " ";
 							}
 							else
 								health = 150;
+							DWactive = false;
+							perks[2] = " ";
+						}
+						else if (inventory[1] == "Fire sword" && DHactive == true) {
+							num = rand() % 13 + 15; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie2 -= num;
+						}
+						else if (inventory[1] == "Fire sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie2 -= num;
+						}
+						else if (inventory[1] == "Light sword" && DHactive == true) {
+							num = rand() % 13 + 15; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie2 -= num;
+						}
+						else if (inventory[1] == "Light sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie2 -= num;
+						}
+						else if (inventory[1] == "Void sword" && DHactive == true) {
+							num = rand() % 15 + 18; // range from 13-28
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie2 -= num;
+						}
+						else if (inventory[1] == "Void sword") {
+							num = rand() % 15 + 18; // range from 13-28
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie2 -= num;
+						}
+						else if (inventory[1] == "Electric sword" && DHactive == true) {
+							num = rand() % 13 + 15; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie2 -= num;
+						}
+						else if (inventory[1] == "Electric sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie2 -= num;
+						}
+						else {
+							num = rand() % 5 + 3;
+							cout << "you punch the zombie for" << num << " damage" << endl << endl;
+							zombie2 -= num;
+						}
+						break;
+					case 2:
+						if (health < 20 && DWactive == true) {
+							cout << "You passed out for a second but the Dying Wish saved you!" << endl << endl;
+							if (JGactive) {
+								health = 250;
+								DWactive = false;
+								perks[2] = " ";
+							}
+							else
+								health = 150;
+							DWactive = false;
+							perks[2] = " ";
+						}
+						else if (JGactive == true && inventory[3] == "stim") {
+							cout << "you inject the stim and get health!" << endl << endl;
+							health = 250;
+							inventory[3] = " ";
+						}
+						else if (inventory[3] == "stim") {
+							cout << "you inject the stim and get health!" << endl << endl;
+							health = 150;
+							inventory[3] = " "; // erases stim
+						}
+						else cout << "you dont have a stim equipped" << endl << endl;
+						break;
+					}
+					cout << "your health:" << health << endl << endl;
+					cout << "the zombies health is:" << zombie2 << endl << endl;
+				}
+				else {
+					num = rand() % 20 + 15; // range from 30-40
+					cout << "you get hit by zombie for " << num << " damage" << endl << endl;
+					health -= num;
+
+					cout << "press 1 to attack, 2 to use stim" << endl << endl;
+					cin >> input;
+
+					switch (input) {
+					case 1:
+						//player attack
+						if (health < 20 && DWactive == true) {
+							cout << "You passed out for a second but the Dying Wish saved you!" << endl << endl;
+							if (JGactive) {
+								health = 250;
+								DWactive = false;
+								perks[2] = " ";
+							}
+							else
+								health = 150;
+							DWactive = false;
+							perks[2] = " ";
 						}
 						else if (inventory[1] == "Fire sword" && DHactive == true) {
 							num = rand() % 13 + 15; // range from 10-20
@@ -524,7 +741,19 @@ void Horde() {
 						}
 						break;
 					case 2:
-						if (JGactive == true && inventory[3] == "stim") {
+						if (health < 20 && DWactive == true) {
+							cout << "You passed out for a second but the Dying Wish saved you!" << endl << endl;
+							if (JGactive) {
+								health = 250;
+								DWactive = false;
+								perks[2] = " ";
+							}
+							else
+								health = 150;
+							DWactive = false;
+							perks[2] = " ";
+						}
+						else if (JGactive == true && inventory[3] == "stim") {
 							cout << "you inject the stim and get health!" << endl << endl;
 							health = 250;
 							inventory[3] = " ";
@@ -545,7 +774,1881 @@ void Horde() {
 				}
 
 			}
+		}
+
+		if (zombie2 <= 0) {
+			while (health > 0 && zombie3 > 0) {
+				cout << "----------------------" << endl;
+				cout << "The next zombie charges at you!" << endl << endl;
+				//monster attack
+				if (inventory[0] == "armor") {
+					num = rand() % 10 + 10; // range from 10-20
+					cout << "you get hit by zombie for " << num << " damage (reduced because of armor)" << endl << endl;
+					health -= num;
+
+					cout << "press 1 to attack, 2 to use stim" << endl << endl;
+					cin >> input;
+
+					switch (input) {
+					case 1:
+						//player attack
+						if (health < 20 && DWactive == true) {
+							cout << "You passed out for a second but the Dying Wish saved you!" << endl << endl;
+							if (JGactive) {
+								health += 100;
+								DWactive = false;
+								perks[2] = " ";
+							}
+							else
+								health = 50;
+							DWactive = false;
+							perks[2] = " ";
+						}
+						else if (inventory[1] == "Fire sword" && DHactive == true) {
+							num = rand() % 13 + 15; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie3 -= num;
+						}
+						else if (inventory[1] == "Fire sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie3 -= num;
+						}
+						else if (inventory[1] == "Light sword" && DHactive == true) {
+							num = rand() % 13 + 15; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie3 -= num;
+						}
+						else if (inventory[1] == "Light sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie3 -= num;
+						}
+						else if (inventory[1] == "Void sword" && DHactive == true) {
+							num = rand() % 15 + 18; // range from 13-28
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie3 -= num;
+						}
+						else if (inventory[1] == "Void sword") {
+							num = rand() % 15 + 18; // range from 13-28
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie3 -= num;
+						}
+						else if (inventory[1] == "Electric sword" && DHactive == true) {
+							num = rand() % 13 + 15; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie3 -= num;
+						}
+						else if (inventory[1] == "Electric sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie3 -= num;
+						}
+						else {
+							num = rand() % 5 + 3;
+							cout << "you punch the zombie for" << num << " damage" << endl << endl;
+							zombie3 -= num;
+						}
+						break;
+					case 2:
+						if (health < 20 && DWactive == true) {
+							cout << "You passed out for a second but the Dying Wish saved you!" << endl << endl;
+							if (JGactive) {
+								health = 250;
+								DWactive = false;
+								perks[2] = " ";
+							}
+							else
+								health = 150;
+							DWactive = false;
+							perks[2] = " ";
+						}
+						else if (JGactive == true && inventory[3] == "stim") {
+							cout << "you inject the stim and get health!" << endl << endl;
+							health = 250;
+							inventory[3] = " ";
+						}
+						else if (inventory[3] == "stim") {
+							cout << "you inject the stim and get health!" << endl << endl;
+							health = 150;
+							inventory[3] = " "; // erases stim
+						}
+						else cout << "you dont have a stim equipped" << endl << endl;
+						break;
+					}
+					cout << "your health:" << health << endl << endl;
+					cout << "the zombies health is:" << zombie3 << endl << endl;
+				}
+				else if (inventory[0] != "armor") {
+					num = rand() % 30 + 10; // range from 30-40
+					cout << "you get hit by zombie for " << num << " damage" << endl << endl;
+					health -= num;
+
+					cout << "press 1 to attack, 2 to use stim" << endl << endl;
+					cin >> input;
+
+					switch (input) {
+					case 1:
+						//player attack
+						if (health < 20 && DWactive == true) {
+							cout << "You passed out for a second but the Dying Wish saved you!" << endl << endl;
+							if (JGactive) {
+								health = 250;
+								DWactive = false;
+								perks[2] = " ";
+							}
+							else
+								health = 150;
+							DWactive = false;
+							perks[2] = " ";
+						}
+						else if (inventory[1] == "Fire sword" && DHactive == true) {
+							num = rand() % 13 + 15; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie3 -= num;
+						}
+						else if (inventory[1] == "Fire sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie3 -= num;
+						}
+						else if (inventory[1] == "Light sword" && DHactive == true) {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie3 -= num;
+						}
+						else if (inventory[1] == "Light sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie3 -= num;
+						}
+						else if (inventory[1] == "Void sword" && DHactive == true) {
+							num = rand() % 15 + 18; // range from 13-28
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie3 -= num;
+						}
+						else if (inventory[1] == "Void sword") {
+							num = rand() % 13 + 15; // range from 13-28
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie3 -= num;
+						}
+						else if (inventory[1] == "Electric sword" && DHactive == true) {
+							num = rand() % 13 + 15; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie3 -= num;
+						}
+						else if (inventory[1] == "Electric sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie3 -= num;
+						}
+						else {
+							num = rand() % 5 + 3;
+							cout << "you punch the zombie for" << num << " damage" << endl << endl;
+							zombie3 -= num;
+						}
+						break;
+					case 2:
+						if (health < 20 && DWactive == true) {
+							cout << "You passed out for a second but the Dying Wish saved you!" << endl << endl;
+							if (JGactive) {
+								health = 250;
+								DWactive = false;
+								perks[2] = " ";
+							}
+							else
+								health = 150;
+							DWactive = false;
+							perks[2] = " ";
+						}
+						else if (JGactive == true && inventory[3] == "stim") {
+							cout << "you inject the stim and get health!" << endl << endl;
+							health = 250;
+							inventory[3] = " ";
+						}
+						else if (inventory[3] == "stim") {
+							cout << "you inject the stim and get health!" << endl << endl;
+							health = 150;
+							inventory[3] = " "; // erases stim
+						}
+						else cout << "you dont have a stim equipped" << endl << endl;
+						break;
+
+
+
+					}
+					cout << "your health:" << health << endl << endl;
+					cout << "the zombies health is:" << zombie3 << endl << endl;
+				}
+
+			}
+		}
+		if (zombie3 <= 0) {
+			while (health > 0 && zombie4 > 0) {
+				cout << "----------------------" << endl;
+				cout << "The next zombie charges at you!" << endl << endl;
+				//monster attack
+				if (inventory[0] == "armor") {
+					num = rand() % 15 + 10; // range from 10-20
+					cout << "you get hit by zombie for " << num << " damage (reduced because of armor)" << endl << endl;
+					health -= num;
+
+					cout << "press 1 to attack, 2 to use stim" << endl << endl;
+					cin >> input;
+
+					switch (input) {
+					case 1:
+						//player attack
+						if (health < 20 && DWactive == true) {
+							cout << "You passed out for a second but the Dying Wish saved you!" << endl << endl;
+							if (JGactive) {
+								health = 250;
+								DWactive = false;
+								perks[2] = " ";
+							}
+							else
+								health = 150;
+							DWactive = false;
+							perks[2] = " ";
+						}
+						else if (inventory[1] == "Fire sword" && DHactive == true) {
+							num = rand() % 13 + 15; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie4 -= num;
+						}
+						else if (inventory[1] == "Fire sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie4 -= num;
+						}
+						else if (inventory[1] == "Light sword" && DHactive == true) {
+							num = rand() % 13 + 15; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie4 -= num;
+						}
+						else if (inventory[1] == "Light sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie4 -= num;
+						}
+						else if (inventory[1] == "Void sword" && DHactive == true) {
+							num = rand() % 15 + 18; // range from 13-28
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie4 -= num;
+						}
+						else if (inventory[1] == "Void sword") {
+							num = rand() % 15 + 18; // range from 13-28
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie4 -= num;
+						}
+						else if (inventory[1] == "Electric sword" && DHactive == true) {
+							num = rand() % 13 + 15; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie4 -= num;
+						}
+						else if (inventory[1] == "Electric sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie4 -= num;
+						}
+						else {
+							num = rand() % 5 + 3;
+							cout << "you punch the zombie for" << num << " damage" << endl << endl;
+							zombie4 -= num;
+						}
+						break;
+					case 2:
+						if (health < 20 && DWactive == true) {
+							cout << "You passed out for a second but the Dying Wish saved you!" << endl << endl;
+							if (JGactive) {
+								health = 250;
+								DWactive = false;
+								perks[2] = " ";
+							}
+							else
+								health = 150;
+							DWactive = false;
+							perks[2] = " ";
+						}
+						else if (JGactive == true && inventory[3] == "stim") {
+							cout << "you inject the stim and get health!" << endl << endl;
+							health = 250;
+							inventory[3] = " ";
+						}
+						else if (inventory[3] == "stim") {
+							cout << "you inject the stim and get health!" << endl << endl;
+							health = 150;
+							inventory[3] = " "; // erases stim
+						}
+						else cout << "you dont have a stim equipped" << endl << endl;
+						break;
+					}
+					cout << "your health:" << health << endl << endl;
+					cout << "the zombies health is:" << zombie4 << endl << endl;
+				}
+				else {
+					num = rand() % 20 + 15; // range from 30-40
+					cout << "you get hit by zombie for " << num << " damage" << endl << endl;
+					health -= num;
+
+					cout << "press 1 to attack, 2 to use stim" << endl << endl;
+					cin >> input;
+
+					switch (input) {
+					case 1:
+						//player attack
+						if (health < 20 && DWactive == true) {
+							cout << "You passed out for a second but the Dying Wish saved you!" << endl << endl;
+							if (JGactive) {
+								health = 250;
+								DWactive = false;
+								perks[2] = " ";
+							}
+							else
+								health = 150;
+							DWactive = false;
+							perks[2] = " ";
+						}
+						else if (inventory[1] == "Fire sword" && DHactive == true) {
+							num = rand() % 13 + 15; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie4 -= num;
+						}
+						else if (inventory[1] == "Fire sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie4 -= num;
+						}
+						else if (inventory[1] == "Light sword" && DHactive == true) {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie4 -= num;
+						}
+						else if (inventory[1] == "Light sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie4 -= num;
+						}
+						else if (inventory[1] == "Void sword" && DHactive == true) {
+							num = rand() % 15 + 18; // range from 13-28
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie4 -= num;
+						}
+						else if (inventory[1] == "Void sword") {
+							num = rand() % 13 + 15; // range from 13-28
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie4 -= num;
+						}
+						else if (inventory[1] == "Electric sword" && DHactive == true) {
+							num = rand() % 13 + 15; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie4 -= num;
+						}
+						else if (inventory[1] == "Electric sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie4 -= num;
+						}
+						else {
+							num = rand() % 5 + 3;
+							cout << "you punch the zombie for" << num << " damage" << endl << endl;
+							zombie4 -= num;
+						}
+						break;
+					case 2:
+						if (health < 20 && DWactive == true) {
+							cout << "You passed out for a second but the Dying Wish saved you!" << endl << endl;
+							if (JGactive) {
+								health = 250;
+								DWactive = false;
+								perks[2] = " ";
+							}
+							else
+								health = 150;
+							DWactive = false;
+							perks[2] = " ";
+						}
+						else if (JGactive == true && inventory[3] == "stim") {
+							cout << "you inject the stim and get health!" << endl << endl;
+							health = 250;
+							inventory[3] = " ";
+						}
+						else if (inventory[3] == "stim") {
+							cout << "you inject the stim and get health!" << endl << endl;
+							health = 150;
+							inventory[3] = " "; // erases stim
+						}
+						else cout << "you dont have a stim equipped" << endl << endl;
+						break;
+
+
+
+					}
+					cout << "your health:" << health << endl << endl;
+					cout << "the zombies health is:" << zombie4 << endl << endl;
+				}
+
+			}
+		}
+
+		if (zombie4 <= 0) {
+			while (health > 0 && zombie5 > 0) {
+				cout << "----------------------" << endl;
+				cout << "The next zombie charges at you!" << endl << endl;
+				//monster attack
+				if (inventory[0] == "armor") {
+					num = rand() % 10 + 10; // range from 10-20
+					cout << "you get hit by zombie for " << num << " damage (reduced because of armor)" << endl << endl;
+					health -= num;
+
+					cout << "press 1 to attack, 2 to use stim" << endl << endl;
+					cin >> input;
+
+					switch (input) {
+					case 1:
+						//player attack
+						if (health < 20 && DWactive == true) {
+							cout << "You passed out for a second but the Dying Wish saved you!" << endl << endl;
+							if (JGactive) {
+								health += 100;
+								DWactive = false;
+								perks[2] = " ";
+							}
+							else
+								health = 50;
+							DWactive = false;
+							perks[2] = " ";
+						}
+						else if (inventory[1] == "Fire sword" && DHactive == true) {
+							num = rand() % 13 + 15; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie5 -= num;
+						}
+						else if (inventory[1] == "Fire sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie5 -= num;
+						}
+						else if (inventory[1] == "Light sword" && DHactive == true) {
+							num = rand() % 13 + 15; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie5 -= num;
+						}
+						else if (inventory[1] == "Light sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie5 -= num;
+						}
+						else if (inventory[1] == "Void sword" && DHactive == true) {
+							num = rand() % 15 + 18; // range from 13-28
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie5 -= num;
+						}
+						else if (inventory[1] == "Void sword") {
+							num = rand() % 15 + 18; // range from 13-28
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie5 -= num;
+						}
+						else if (inventory[1] == "Electric sword" && DHactive == true) {
+							num = rand() % 13 + 15; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie5 -= num;
+						}
+						else if (inventory[1] == "Electric sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie5 -= num;
+						}
+						else {
+							num = rand() % 5 + 3;
+							cout << "you punch the zombie for" << num << " damage" << endl << endl;
+							zombie5 -= num;
+						}
+						break;
+					case 2:
+						if (health < 20 && DWactive == true) {
+							cout << "You passed out for a second but the Dying Wish saved you!" << endl << endl;
+							if (JGactive) {
+								health = 250;
+								DWactive = false;
+								perks[2] = " ";
+							}
+							else
+								health = 150;
+							DWactive = false;
+							perks[2] = " ";
+						}
+						else if (JGactive == true && inventory[3] == "stim") {
+							cout << "you inject the stim and get health!" << endl << endl;
+							health = 250;
+							inventory[3] = " ";
+						}
+						else if (inventory[3] == "stim") {
+							cout << "you inject the stim and get health!" << endl << endl;
+							health = 150;
+							inventory[3] = " "; // erases stim
+						}
+						else cout << "you dont have a stim equipped" << endl << endl;
+						break;
+					}
+					cout << "your health:" << health << endl << endl;
+					cout << "the zombies health is:" << zombie5 << endl << endl;
+				}
+				else if (inventory[0] != "armor") {
+					num = rand() % 30 + 10; // range from 30-40
+					cout << "you get hit by zombie for " << num << " damage" << endl << endl;
+					health -= num;
+
+					cout << "press 1 to attack, 2 to use stim" << endl << endl;
+					cin >> input;
+
+					switch (input) {
+					case 1:
+						//player attack
+						if (health < 20 && DWactive == true) {
+							cout << "You passed out for a second but the Dying Wish saved you!" << endl << endl;
+							if (JGactive) {
+								health = 250;
+								DWactive = false;
+								perks[2] = " ";
+							}
+							else
+								health = 150;
+							DWactive = false;
+							perks[2] = " ";
+						}
+						else if (inventory[1] == "Fire sword" && DHactive == true) {
+							num = rand() % 13 + 15; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie5 -= num;
+						}
+						else if (inventory[1] == "Fire sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie5 -= num;
+						}
+						else if (inventory[1] == "Light sword" && DHactive == true) {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie5 -= num;
+						}
+						else if (inventory[1] == "Light sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie5 -= num;
+						}
+						else if (inventory[1] == "Void sword" && DHactive == true) {
+							num = rand() % 15 + 18; // range from 13-28
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie5 -= num;
+						}
+						else if (inventory[1] == "Void sword") {
+							num = rand() % 13 + 15; // range from 13-28
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie5 -= num;
+						}
+						else if (inventory[1] == "Electric sword" && DHactive == true) {
+							num = rand() % 13 + 15; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie5 -= num;
+						}
+						else if (inventory[1] == "Electric sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie5 -= num;
+						}
+						else {
+							num = rand() % 5 + 3;
+							cout << "you punch the zombie for" << num << " damage" << endl << endl;
+							zombie5 -= num;
+						}
+						break;
+					case 2:
+						if (health < 20 && DWactive == true) {
+							cout << "You passed out for a second but the Dying Wish saved you!" << endl << endl;
+							if (JGactive) {
+								health = 250;
+								DWactive = false;
+								perks[2] = " ";
+							}
+							else
+								health = 150;
+							DWactive = false;
+							perks[2] = " ";
+						}
+						else if (JGactive == true && inventory[3] == "stim") {
+							cout << "you inject the stim and get health!" << endl << endl;
+							health = 250;
+							inventory[3] = " ";
+						}
+						else if (inventory[3] == "stim") {
+							cout << "you inject the stim and get health!" << endl << endl;
+							health = 150;
+							inventory[3] = " "; // erases stim
+						}
+						else cout << "you dont have a stim equipped" << endl << endl;
+						break;
+
+
+
+					}
+					cout << "your health:" << health << endl << endl;
+					cout << "the zombies health is:" << zombie5 << endl << endl;
+				}
+
+			}
+		}
+		if (zombie5 <= 0) {
+			while (health > 0 && zombie6 > 0) {
+				cout << "----------------------" << endl;
+				cout << "The next zombie charges at you!" << endl << endl;
+				//monster attack
+				if (inventory[0] == "armor") {
+					num = rand() % 15 + 10; // range from 10-20
+					cout << "you get hit by zombie for " << num << " damage (reduced because of armor)" << endl << endl;
+					health -= num;
+
+					cout << "press 1 to attack, 2 to use stim" << endl << endl;
+					cin >> input;
+
+					switch (input) {
+					case 1:
+						//player attack
+						if (health < 20 && DWactive == true) {
+							cout << "You passed out for a second but the Dying Wish saved you!" << endl << endl;
+							if (JGactive) {
+								health = 250;
+								DWactive = false;
+								perks[2] = " ";
+							}
+							else
+								health = 150;
+							DWactive = false;
+							perks[2] = " ";
+						}
+						else if (inventory[1] == "Fire sword" && DHactive == true) {
+							num = rand() % 13 + 15; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie6 -= num;
+						}
+						else if (inventory[1] == "Fire sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie6 -= num;
+						}
+						else if (inventory[1] == "Light sword" && DHactive == true) {
+							num = rand() % 13 + 15; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie6 -= num;
+						}
+						else if (inventory[1] == "Light sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie6 -= num;
+						}
+						else if (inventory[1] == "Void sword" && DHactive == true) {
+							num = rand() % 15 + 18; // range from 13-28
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie6 -= num;
+						}
+						else if (inventory[1] == "Void sword") {
+							num = rand() % 15 + 18; // range from 13-28
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie6 -= num;
+						}
+						else if (inventory[1] == "Electric sword" && DHactive == true) {
+							num = rand() % 13 + 15; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie6 -= num;
+						}
+						else if (inventory[1] == "Electric sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie6 -= num;
+						}
+						else {
+							num = rand() % 5 + 3;
+							cout << "you punch the zombie for" << num << " damage" << endl << endl;
+							zombie6 -= num;
+						}
+						break;
+					case 2:
+						if (health < 20 && DWactive == true) {
+							cout << "You passed out for a second but the Dying Wish saved you!" << endl << endl;
+							if (JGactive) {
+								health = 250;
+								DWactive = false;
+								perks[2] = " ";
+							}
+							else
+								health = 150;
+							DWactive = false;
+							perks[2] = " ";
+						}
+						else if (JGactive == true && inventory[3] == "stim") {
+							cout << "you inject the stim and get health!" << endl << endl;
+							health = 250;
+							inventory[3] = " ";
+						}
+						else if (inventory[3] == "stim") {
+							cout << "you inject the stim and get health!" << endl << endl;
+							health = 150;
+							inventory[3] = " "; // erases stim
+						}
+						else cout << "you dont have a stim equipped" << endl << endl;
+						break;
+					}
+					cout << "your health:" << health << endl << endl;
+					cout << "the zombies health is:" << zombie6 << endl << endl;
+				}
+				else {
+					num = rand() % 20 + 15; // range from 30-40
+					cout << "you get hit by zombie for " << num << " damage" << endl << endl;
+					health -= num;
+
+					cout << "press 1 to attack, 2 to use stim" << endl << endl;
+					cin >> input;
+
+					switch (input) {
+					case 1:
+						//player attack
+						if (health < 20 && DWactive == true) {
+							cout << "You passed out for a second but the Dying Wish saved you!" << endl << endl;
+							if (JGactive) {
+								health = 250;
+								DWactive = false;
+								perks[2] = " ";
+							}
+							else
+								health = 150;
+							DWactive = false;
+							perks[2] = " ";
+						}
+						else if (inventory[1] == "Fire sword" && DHactive == true) {
+							num = rand() % 13 + 15; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie6 -= num;
+						}
+						else if (inventory[1] == "Fire sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie6 -= num;
+						}
+						else if (inventory[1] == "Light sword" && DHactive == true) {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie6 -= num;
+						}
+						else if (inventory[1] == "Light sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie6 -= num;
+						}
+						else if (inventory[1] == "Void sword" && DHactive == true) {
+							num = rand() % 15 + 18; // range from 13-28
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie6 -= num;
+						}
+						else if (inventory[1] == "Void sword") {
+							num = rand() % 13 + 15; // range from 13-28
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie6 -= num;
+						}
+						else if (inventory[1] == "Electric sword" && DHactive == true) {
+							num = rand() % 13 + 15; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie6 -= num;
+						}
+						else if (inventory[1] == "Electric sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie6 -= num;
+						}
+						else {
+							num = rand() % 5 + 3;
+							cout << "you punch the zombie for" << num << " damage" << endl << endl;
+							zombie6 -= num;
+						}
+						break;
+					case 2:
+						if (health < 20 && DWactive == true) {
+							cout << "You passed out for a second but the Dying Wish saved you!" << endl << endl;
+							if (JGactive) {
+								health = 250;
+								DWactive = false;
+								perks[2] = " ";
+							}
+							else
+								health = 150;
+							DWactive = false;
+							perks[2] = " ";
+						}
+						else if (JGactive == true && inventory[3] == "stim") {
+							cout << "you inject the stim and get health!" << endl << endl;
+							health = 250;
+							inventory[3] = " ";
+						}
+						else if (inventory[3] == "stim") {
+							cout << "you inject the stim and get health!" << endl << endl;
+							health = 150;
+							inventory[3] = " "; // erases stim
+						}
+						else cout << "you dont have a stim equipped" << endl << endl;
+						break;
+
+
+
+					}
+					cout << "your health:" << health << endl << endl;
+					cout << "the zombies health is:" << zombie6 << endl << endl;
+				}
+
+			}
+		}
+
+		if (zombie6 <= 0) {
+			while (health > 0 && zombie7 > 0) {
+				cout << "----------------------" << endl;
+				cout << "The next zombie charges at you!" << endl << endl;
+				//monster attack
+				if (inventory[0] == "armor") {
+					num = rand() % 10 + 10; // range from 10-20
+					cout << "you get hit by zombie for " << num << " damage (reduced because of armor)" << endl << endl;
+					health -= num;
+
+					cout << "press 1 to attack, 2 to use stim" << endl << endl;
+					cin >> input;
+
+					switch (input) {
+					case 1:
+						//player attack
+						if (health < 20 && DWactive == true) {
+							cout << "You passed out for a second but the Dying Wish saved you!" << endl << endl;
+							if (JGactive) {
+								health += 100;
+								DWactive = false;
+								perks[2] = " ";
+							}
+							else
+								health = 50;
+							DWactive = false;
+							perks[2] = " ";
+						}
+						else if (inventory[1] == "Fire sword" && DHactive == true) {
+							num = rand() % 13 + 15; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie7 -= num;
+						}
+						else if (inventory[1] == "Fire sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie7 -= num;
+						}
+						else if (inventory[1] == "Light sword" && DHactive == true) {
+							num = rand() % 13 + 15; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie7 -= num;
+						}
+						else if (inventory[1] == "Light sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie7 -= num;
+						}
+						else if (inventory[1] == "Void sword" && DHactive == true) {
+							num = rand() % 15 + 18; // range from 13-28
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie7 -= num;
+						}
+						else if (inventory[1] == "Void sword") {
+							num = rand() % 15 + 18; // range from 13-28
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie7 -= num;
+						}
+						else if (inventory[1] == "Electric sword" && DHactive == true) {
+							num = rand() % 13 + 15; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie7 -= num;
+						}
+						else if (inventory[1] == "Electric sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie7 -= num;
+						}
+						else {
+							num = rand() % 5 + 3;
+							cout << "you punch the zombie for" << num << " damage" << endl << endl;
+							zombie7 -= num;
+						}
+						break;
+					case 2:
+						if (health < 20 && DWactive == true) {
+							cout << "You passed out for a second but the Dying Wish saved you!" << endl << endl;
+							if (JGactive) {
+								health = 250;
+								DWactive = false;
+								perks[2] = " ";
+							}
+							else
+								health = 150;
+							DWactive = false;
+							perks[2] = " ";
+						}
+						else if (JGactive == true && inventory[3] == "stim") {
+							cout << "you inject the stim and get health!" << endl << endl;
+							health = 250;
+							inventory[3] = " ";
+						}
+						else if (inventory[3] == "stim") {
+							cout << "you inject the stim and get health!" << endl << endl;
+							health = 150;
+							inventory[3] = " "; // erases stim
+						}
+						else cout << "you dont have a stim equipped" << endl << endl;
+						break;
+					}
+					cout << "your health:" << health << endl << endl;
+					cout << "the zombies health is:" << zombie7 << endl << endl;
+				}
+				else if (inventory[0] != "armor") {
+					num = rand() % 30 + 10; // range from 30-40
+					cout << "you get hit by zombie for " << num << " damage" << endl << endl;
+					health -= num;
+
+					cout << "press 1 to attack, 2 to use stim" << endl << endl;
+					cin >> input;
+
+					switch (input) {
+					case 1:
+						//player attack
+						if (health < 20 && DWactive == true) {
+							cout << "You passed out for a second but the Dying Wish saved you!" << endl << endl;
+							if (JGactive) {
+								health = 250;
+								DWactive = false;
+								perks[2] = " ";
+							}
+							else
+								health = 150;
+							DWactive = false;
+							perks[2] = " ";
+						}
+						else if (inventory[1] == "Fire sword" && DHactive == true) {
+							num = rand() % 13 + 15; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie7 -= num;
+						}
+						else if (inventory[1] == "Fire sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie7 -= num;
+						}
+						else if (inventory[1] == "Light sword" && DHactive == true) {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie7 -= num;
+						}
+						else if (inventory[1] == "Light sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie7 -= num;
+						}
+						else if (inventory[1] == "Void sword" && DHactive == true) {
+							num = rand() % 15 + 18; // range from 13-28
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie7 -= num;
+						}
+						else if (inventory[1] == "Void sword") {
+							num = rand() % 13 + 15; // range from 13-28
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie7 -= num;
+						}
+						else if (inventory[1] == "Electric sword" && DHactive == true) {
+							num = rand() % 13 + 15; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie7 -= num;
+						}
+						else if (inventory[1] == "Electric sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie7 -= num;
+						}
+						else {
+							num = rand() % 5 + 3;
+							cout << "you punch the zombie for" << num << " damage" << endl << endl;
+							zombie7 -= num;
+						}
+						break;
+					case 2:
+						if (health < 20 && DWactive == true) {
+							cout << "You passed out for a second but the Dying Wish saved you!" << endl << endl;
+							if (JGactive) {
+								health = 250;
+								DWactive = false;
+								perks[2] = " ";
+							}
+							else
+								health = 150;
+							DWactive = false;
+							perks[2] = " ";
+						}
+						else if (JGactive == true && inventory[3] == "stim") {
+							cout << "you inject the stim and get health!" << endl << endl;
+							health = 250;
+							inventory[3] = " ";
+						}
+						else if (inventory[3] == "stim") {
+							cout << "you inject the stim and get health!" << endl << endl;
+							health = 150;
+							inventory[3] = " "; // erases stim
+						}
+						else cout << "you dont have a stim equipped" << endl << endl;
+						break;
+
+
+
+					}
+					cout << "your health:" << health << endl << endl;
+					cout << "the zombies health is:" << zombie7 << endl << endl;
+				}
+
+			}
+		}
+		if (zombie7 <= 0) {
+			while (health > 0 && zombie8 > 0) {
+				cout << "----------------------" << endl;
+				cout << "The next zombie charges at you!" << endl << endl;
+				//monster attack
+				if (inventory[0] == "armor") {
+					num = rand() % 15 + 10; // range from 10-20
+					cout << "you get hit by zombie for " << num << " damage (reduced because of armor)" << endl << endl;
+					health -= num;
+
+					cout << "press 1 to attack, 2 to use stim" << endl << endl;
+					cin >> input;
+
+					switch (input) {
+					case 1:
+						//player attack
+						if (health < 20 && DWactive == true) {
+							cout << "You passed out for a second but the Dying Wish saved you!" << endl << endl;
+							if (JGactive) {
+								health = 250;
+								DWactive = false;
+								perks[2] = " ";
+							}
+							else
+								health = 150;
+							DWactive = false;
+							perks[2] = " ";
+						}
+						else if (inventory[1] == "Fire sword" && DHactive == true) {
+							num = rand() % 13 + 15; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie8 -= num;
+						}
+						else if (inventory[1] == "Fire sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie8 -= num;
+						}
+						else if (inventory[1] == "Light sword" && DHactive == true) {
+							num = rand() % 13 + 15; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie8 -= num;
+						}
+						else if (inventory[1] == "Light sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie8 -= num;
+						}
+						else if (inventory[1] == "Void sword" && DHactive == true) {
+							num = rand() % 15 + 18; // range from 13-28
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie8 -= num;
+						}
+						else if (inventory[1] == "Void sword") {
+							num = rand() % 15 + 18; // range from 13-28
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie8 -= num;
+						}
+						else if (inventory[1] == "Electric sword" && DHactive == true) {
+							num = rand() % 13 + 15; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie8 -= num;
+						}
+						else if (inventory[1] == "Electric sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie8 -= num;
+						}
+						else {
+							num = rand() % 5 + 3;
+							cout << "you punch the zombie for" << num << " damage" << endl << endl;
+							zombie8 -= num;
+						}
+						break;
+					case 2:
+						if (health < 20 && DWactive == true) {
+							cout << "You passed out for a second but the Dying Wish saved you!" << endl << endl;
+							if (JGactive) {
+								health = 250;
+								DWactive = false;
+								perks[2] = " ";
+							}
+							else
+								health = 150;
+							DWactive = false;
+							perks[2] = " ";
+						}
+						else if (JGactive == true && inventory[3] == "stim") {
+							cout << "you inject the stim and get health!" << endl << endl;
+							health = 250;
+							inventory[3] = " ";
+						}
+						else if (inventory[3] == "stim") {
+							cout << "you inject the stim and get health!" << endl << endl;
+							health = 150;
+							inventory[3] = " "; // erases stim
+						}
+						else cout << "you dont have a stim equipped" << endl << endl;
+						break;
+					}
+					cout << "your health:" << health << endl << endl;
+					cout << "the zombies health is:" << zombie8 << endl << endl;
+				}
+				else {
+					num = rand() % 20 + 15; // range from 30-40
+					cout << "you get hit by zombie for " << num << " damage" << endl << endl;
+					health -= num;
+
+					cout << "press 1 to attack, 2 to use stim" << endl << endl;
+					cin >> input;
+
+					switch (input) {
+					case 1:
+						//player attack
+						if (health < 20 && DWactive == true) {
+							cout << "You passed out for a second but the Dying Wish saved you!" << endl << endl;
+							if (JGactive) {
+								health = 250;
+								DWactive = false;
+								perks[2] = " ";
+							}
+							else
+								health = 150;
+							DWactive = false;
+							perks[2] = " ";
+						}
+						else if (inventory[1] == "Fire sword" && DHactive == true) {
+							num = rand() % 13 + 15; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie8 -= num;
+						}
+						else if (inventory[1] == "Fire sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie8 -= num;
+						}
+						else if (inventory[1] == "Light sword" && DHactive == true) {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie8 -= num;
+						}
+						else if (inventory[1] == "Light sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie8 -= num;
+						}
+						else if (inventory[1] == "Void sword" && DHactive == true) {
+							num = rand() % 15 + 18; // range from 13-28
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie8 -= num;
+						}
+						else if (inventory[1] == "Void sword") {
+							num = rand() % 13 + 15; // range from 13-28
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie8 -= num;
+						}
+						else if (inventory[1] == "Electric sword" && DHactive == true) {
+							num = rand() % 13 + 15; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie8 -= num;
+						}
+						else if (inventory[1] == "Electric sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie8 -= num;
+						}
+						else {
+							num = rand() % 5 + 3;
+							cout << "you punch the zombie for" << num << " damage" << endl << endl;
+							zombie8 -= num;
+						}
+						break;
+					case 2:
+						if (health < 20 && DWactive == true) {
+							cout << "You passed out for a second but the Dying Wish saved you!" << endl << endl;
+							if (JGactive) {
+								health = 250;
+								DWactive = false;
+								perks[2] = " ";
+							}
+							else
+								health = 150;
+							DWactive = false;
+							perks[2] = " ";
+						}
+						else if (JGactive == true && inventory[3] == "stim") {
+							cout << "you inject the stim and get health!" << endl << endl;
+							health = 250;
+							inventory[3] = " ";
+						}
+						else if (inventory[3] == "stim") {
+							cout << "you inject the stim and get health!" << endl << endl;
+							health = 150;
+							inventory[3] = " "; // erases stim
+						}
+						else cout << "you dont have a stim equipped" << endl << endl;
+						break;
+
+
+
+					}
+					cout << "your health:" << health << endl << endl;
+					cout << "the zombies health is:" << zombie8 << endl << endl;
+				}
+
+			}
+		}
+
+		if (zombie8 <= 0) {
+			while (health > 0 && zombie9 > 0) {
+				cout << "----------------------" << endl;
+				cout << "The next zombie charges at you!" << endl << endl;
+				//monster attack
+				if (inventory[0] == "armor") {
+					num = rand() % 10 + 10; // range from 10-20
+					cout << "you get hit by zombie for " << num << " damage (reduced because of armor)" << endl << endl;
+					health -= num;
+
+					cout << "press 1 to attack, 2 to use stim" << endl << endl;
+					cin >> input;
+
+					switch (input) {
+					case 1:
+						//player attack
+						if (health < 20 && DWactive == true) {
+							cout << "You passed out for a second but the Dying Wish saved you!" << endl << endl;
+							if (JGactive) {
+								health += 100;
+								DWactive = false;
+								perks[2] = " ";
+							}
+							else
+								health = 50;
+							DWactive = false;
+							perks[2] = " ";
+						}
+						else if (inventory[1] == "Fire sword" && DHactive == true) {
+							num = rand() % 13 + 15; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie9 -= num;
+						}
+						else if (inventory[1] == "Fire sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie9 -= num;
+						}
+						else if (inventory[1] == "Light sword" && DHactive == true) {
+							num = rand() % 13 + 15; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie9 -= num;
+						}
+						else if (inventory[1] == "Light sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie9 -= num;
+						}
+						else if (inventory[1] == "Void sword" && DHactive == true) {
+							num = rand() % 15 + 18; // range from 13-28
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie9 -= num;
+						}
+						else if (inventory[1] == "Void sword") {
+							num = rand() % 15 + 18; // range from 13-28
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie9 -= num;
+						}
+						else if (inventory[1] == "Electric sword" && DHactive == true) {
+							num = rand() % 13 + 15; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie9 -= num;
+						}
+						else if (inventory[1] == "Electric sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie9 -= num;
+						}
+						else {
+							num = rand() % 5 + 3;
+							cout << "you punch the zombie for" << num << " damage" << endl << endl;
+							zombie9 -= num;
+						}
+						break;
+					case 2:
+						if (health < 20 && DWactive == true) {
+							cout << "You passed out for a second but the Dying Wish saved you!" << endl << endl;
+							if (JGactive) {
+								health = 250;
+								DWactive = false;
+								perks[2] = " ";
+							}
+							else
+								health = 150;
+							DWactive = false;
+							perks[2] = " ";
+						}
+						else if (JGactive == true && inventory[3] == "stim") {
+							cout << "you inject the stim and get health!" << endl << endl;
+							health = 250;
+							inventory[3] = " ";
+						}
+						else if (inventory[3] == "stim") {
+							cout << "you inject the stim and get health!" << endl << endl;
+							health = 150;
+							inventory[3] = " "; // erases stim
+						}
+						else cout << "you dont have a stim equipped" << endl << endl;
+						break;
+					}
+					cout << "your health:" << health << endl << endl;
+					cout << "the zombies health is:" << zombie9 << endl << endl;
+				}
+				else if (inventory[0] != "armor") {
+					num = rand() % 30 + 10; // range from 30-40
+					cout << "you get hit by zombie for " << num << " damage" << endl << endl;
+					health -= num;
+
+					cout << "press 1 to attack, 2 to use stim" << endl << endl;
+					cin >> input;
+
+					switch (input) {
+					case 1:
+						//player attack
+						if (health < 20 && DWactive == true) {
+							cout << "You passed out for a second but the Dying Wish saved you!" << endl << endl;
+							if (JGactive) {
+								health = 250;
+								DWactive = false;
+								perks[2] = " ";
+							}
+							else
+								health = 150;
+							DWactive = false;
+							perks[2] = " ";
+						}
+						else if (inventory[1] == "Fire sword" && DHactive == true) {
+							num = rand() % 13 + 15; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie9 -= num;
+						}
+						else if (inventory[1] == "Fire sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie9 -= num;
+						}
+						else if (inventory[1] == "Light sword" && DHactive == true) {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie9 -= num;
+						}
+						else if (inventory[1] == "Light sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie9 -= num;
+						}
+						else if (inventory[1] == "Void sword" && DHactive == true) {
+							num = rand() % 15 + 18; // range from 13-28
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie9 -= num;
+						}
+						else if (inventory[1] == "Void sword") {
+							num = rand() % 13 + 15; // range from 13-28
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie9 -= num;
+						}
+						else if (inventory[1] == "Electric sword" && DHactive == true) {
+							num = rand() % 13 + 15; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie9-= num;
+						}
+						else if (inventory[1] == "Electric sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie9 -= num;
+						}
+						else {
+							num = rand() % 5 + 3;
+							cout << "you punch the zombie for" << num << " damage" << endl << endl;
+							zombie9 -= num;
+						}
+						break;
+					case 2:
+						if (health < 20 && DWactive == true) {
+							cout << "You passed out for a second but the Dying Wish saved you!" << endl << endl;
+							if (JGactive) {
+								health = 250;
+								DWactive = false;
+								perks[2] = " ";
+							}
+							else
+								health = 150;
+							DWactive = false;
+							perks[2] = " ";
+						}
+						else if (JGactive == true && inventory[3] == "stim") {
+							cout << "you inject the stim and get health!" << endl << endl;
+							health = 250;
+							inventory[3] = " ";
+						}
+						else if (inventory[3] == "stim") {
+							cout << "you inject the stim and get health!" << endl << endl;
+							health = 150;
+							inventory[3] = " "; // erases stim
+						}
+						else cout << "you dont have a stim equipped" << endl << endl;
+						break;
+
+
+
+					}
+					cout << "your health:" << health << endl << endl;
+					cout << "the zombies health is:" << zombie9 << endl << endl;
+				}
+
+			}
+		}
+		if (zombie9 <= 0) {
+			while (health > 0 && zombie10 > 0) {
+				cout << "----------------------" << endl;
+				cout << "The next zombie charges at you!" << endl << endl;
+				//monster attack
+				if (inventory[0] == "armor") {
+					num = rand() % 15 + 10; // range from 10-20
+					cout << "you get hit by zombie for " << num << " damage (reduced because of armor)" << endl << endl;
+					health -= num;
+
+					cout << "press 1 to attack, 2 to use stim" << endl << endl;
+					cin >> input;
+
+					switch (input) {
+					case 1:
+						//player attack
+						if (health < 20 && DWactive == true) {
+							cout << "You passed out for a second but the Dying Wish saved you!" << endl << endl;
+							if (JGactive) {
+								health = 250;
+								DWactive = false;
+								perks[2] = " ";
+							}
+							else
+								health = 150;
+							DWactive = false;
+							perks[2] = " ";
+						}
+						else if (inventory[1] == "Fire sword" && DHactive == true) {
+							num = rand() % 13 + 15; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie10 -= num;
+						}
+						else if (inventory[1] == "Fire sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie10 -= num;
+						}
+						else if (inventory[1] == "Light sword" && DHactive == true) {
+							num = rand() % 13 + 15; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie10 -= num;
+						}
+						else if (inventory[1] == "Light sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie10 -= num;
+						}
+						else if (inventory[1] == "Void sword" && DHactive == true) {
+							num = rand() % 15 + 18; // range from 13-28
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie10 -= num;
+						}
+						else if (inventory[1] == "Void sword") {
+							num = rand() % 15 + 18; // range from 13-28
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie10 -= num;
+						}
+						else if (inventory[1] == "Electric sword" && DHactive == true) {
+							num = rand() % 13 + 15; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie10 -= num;
+						}
+						else if (inventory[1] == "Electric sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie10 -= num;
+						}
+						else {
+							num = rand() % 5 + 3;
+							cout << "you punch the zombie for" << num << " damage" << endl << endl;
+							zombie10 -= num;
+						}
+						break;
+					case 2:
+						if (health < 20 && DWactive == true) {
+							cout << "You passed out for a second but the Dying Wish saved you!" << endl << endl;
+							if (JGactive) {
+								health = 250;
+								DWactive = false;
+								perks[2] = " ";
+							}
+							else
+								health = 150;
+							DWactive = false;
+							perks[2] = " ";
+						}
+						else if (JGactive == true && inventory[3] == "stim") {
+							cout << "you inject the stim and get health!" << endl << endl;
+							health = 250;
+							inventory[3] = " ";
+						}
+						else if (inventory[3] == "stim") {
+							cout << "you inject the stim and get health!" << endl << endl;
+							health = 150;
+							inventory[3] = " "; // erases stim
+						}
+						else cout << "you dont have a stim equipped" << endl << endl;
+						break;
+					}
+					cout << "your health:" << health << endl << endl;
+					cout << "the zombies health is:" << zombie10 << endl << endl;
+				}
+				else {
+					num = rand() % 20 + 15; // range from 30-40
+					cout << "you get hit by zombie for " << num << " damage" << endl << endl;
+					health -= num;
+
+					cout << "press 1 to attack, 2 to use stim" << endl << endl;
+					cin >> input;
+
+					switch (input) {
+					case 1:
+						//player attack
+						if (health < 20 && DWactive == true) {
+							cout << "You passed out for a second but the Dying Wish saved you!" << endl << endl;
+							if (JGactive) {
+								health = 250;
+								DWactive = false;
+								perks[2] = " ";
+							}
+							else
+								health = 150;
+							DWactive = false;
+							perks[2] = " ";
+						}
+						else if (inventory[1] == "Fire sword" && DHactive == true) {
+							num = rand() % 13 + 15; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie10 -= num;
+						}
+						else if (inventory[1] == "Fire sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie10 -= num;
+						}
+						else if (inventory[1] == "Light sword" && DHactive == true) {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie10 -= num;
+						}
+						else if (inventory[1] == "Light sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie10 -= num;
+						}
+						else if (inventory[1] == "Void sword" && DHactive == true) {
+							num = rand() % 15 + 18; // range from 13-28
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie10 -= num;
+						}
+						else if (inventory[1] == "Void sword") {
+							num = rand() % 13 + 15; // range from 13-28
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie10 -= num;
+						}
+						else if (inventory[1] == "Electric sword" && DHactive == true) {
+							num = rand() % 13 + 15; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie10 -= num;
+						}
+						else if (inventory[1] == "Electric sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							zombie10 -= num;
+						}
+						else {
+							num = rand() % 5 + 3;
+							cout << "you punch the zombie for" << num << " damage" << endl << endl;
+							zombie10 -= num;
+						}
+						break;
+					case 2:
+						if (health < 20 && DWactive == true) {
+							cout << "You passed out for a second but the Dying Wish saved you!" << endl << endl;
+							if (JGactive) {
+								health = 250;
+								DWactive = false;
+								perks[2] = " ";
+							}
+							else
+								health = 150;
+							DWactive = false;
+							perks[2] = " ";
+						}
+						else if (JGactive == true && inventory[3] == "stim") {
+							cout << "you inject the stim and get health!" << endl << endl;
+							health = 250;
+							inventory[3] = " ";
+						}
+						else if (inventory[3] == "stim") {
+							cout << "you inject the stim and get health!" << endl << endl;
+							health = 150;
+							inventory[3] = " "; // erases stim
+						}
+						else cout << "you dont have a stim equipped" << endl << endl;
+						break;
+
+
+
+					}
+					cout << "your health:" << health << endl << endl;
+					cout << "the zombies health is:" << zombie10 << endl << endl;
+				}
+
+			}
+		}
+
+		if (zombie10 <= 0) {
+			while (health > 0 && armoredzombie1 > 0) {
+				cout << "----------------------" << endl;
+				cout << "AN ARMORED ZOMBIE IS ATTACKING IT HAS EXTRA HEALTH!!!" << endl << endl;
+				//monster attack
+				if (inventory[0] == "armor") {
+					num = rand() % 10 + 10; // range from 10-20
+					cout << "you get hit by zombie for " << num << " damage (reduced because of armor)" << endl << endl;
+					health -= num;
+
+					cout << "press 1 to attack, 2 to use stim" << endl << endl;
+					cin >> input;
+
+					switch (input) {
+					case 1:
+						//player attack
+						if (health < 20 && DWactive == true) {
+							cout << "You passed out for a second but the Dying Wish saved you!" << endl << endl;
+							if (JGactive) {
+								health += 100;
+								DWactive = false;
+								perks[2] = " ";
+							}
+							else
+								health = 50;
+							DWactive = false;
+							perks[2] = " ";
+						}
+						else if (inventory[1] == "Fire sword" && DHactive == true) {
+							num = rand() % 13 + 15; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							armoredzombie1 -= num;
+						}
+						else if (inventory[1] == "Fire sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							armoredzombie1 -= num;
+						}
+						else if (inventory[1] == "Light sword" && DHactive == true) {
+							num = rand() % 13 + 15; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							armoredzombie1 -= num;
+						}
+						else if (inventory[1] == "Light sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							armoredzombie1 -= num;
+						}
+						else if (inventory[1] == "Void sword" && DHactive == true) {
+							num = rand() % 15 + 18; // range from 13-28
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							armoredzombie1 -= num;
+						}
+						else if (inventory[1] == "Void sword") {
+							num = rand() % 15 + 18; // range from 13-28
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							armoredzombie1 -= num;
+						}
+						else if (inventory[1] == "Electric sword" && DHactive == true) {
+							num = rand() % 13 + 15; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							armoredzombie1 -= num;
+						}
+						else if (inventory[1] == "Electric sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							armoredzombie1 -= num;
+						}
+						else {
+							num = rand() % 5 + 3;
+							cout << "you punch the zombie for" << num << " damage" << endl << endl;
+							armoredzombie1 -= num;
+						}
+						break;
+					case 2:
+						if (health < 20 && DWactive == true) {
+							cout << "You passed out for a second but the Dying Wish saved you!" << endl << endl;
+							if (JGactive) {
+								health = 250;
+								DWactive = false;
+								perks[2] = " ";
+							}
+							else
+								health = 150;
+							DWactive = false;
+							perks[2] = " ";
+						}
+						else if (JGactive == true && inventory[3] == "stim") {
+							cout << "you inject the stim and get health!" << endl << endl;
+							health = 250;
+							inventory[3] = " ";
+						}
+						else if (inventory[3] == "stim") {
+							cout << "you inject the stim and get health!" << endl << endl;
+							health = 150;
+							inventory[3] = " "; // erases stim
+						}
+						else cout << "you dont have a stim equipped" << endl << endl;
+						break;
+					}
+					cout << "your health:" << health << endl << endl;
+					cout << "the zombies health is:" << armoredzombie1 << endl << endl;
+				}
+				else if (inventory[0] != "armor") {
+					num = rand() % 30 + 10; // range from 30-40
+					cout << "you get hit by zombie for " << num << " damage" << endl << endl;
+					health -= num;
+
+					cout << "press 1 to attack, 2 to use stim" << endl << endl;
+					cin >> input;
+
+					switch (input) {
+					case 1:
+						//player attack
+						if (health < 20 && DWactive == true) {
+							cout << "You passed out for a second but the Dying Wish saved you!" << endl << endl;
+							if (JGactive) {
+								health = 250;
+								DWactive = false;
+								perks[2] = " ";
+							}
+							else
+								health = 150;
+							DWactive = false;
+							perks[2] = " ";
+						}
+						else if (inventory[1] == "Fire sword" && DHactive == true) {
+							num = rand() % 13 + 15; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							armoredzombie1 -= num;
+						}
+						else if (inventory[1] == "Fire sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							armoredzombie1 -= num;
+						}
+						else if (inventory[1] == "Light sword" && DHactive == true) {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							armoredzombie1 -= num;
+						}
+						else if (inventory[1] == "Light sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							armoredzombie1 -= num;
+						}
+						else if (inventory[1] == "Void sword" && DHactive == true) {
+							num = rand() % 15 + 18; // range from 13-28
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							armoredzombie1 -= num;
+						}
+						else if (inventory[1] == "Void sword") {
+							num = rand() % 13 + 15; // range from 13-28
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							armoredzombie1 -= num;
+						}
+						else if (inventory[1] == "Electric sword" && DHactive == true) {
+							num = rand() % 13 + 15; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							armoredzombie1 -= num;
+						}
+						else if (inventory[1] == "Electric sword") {
+							num = rand() % 10 + 10; // range from 10-20
+							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+							armoredzombie1 -= num;
+						}
+						else {
+							num = rand() % 5 + 3;
+							cout << "you punch the zombie for" << num << " damage" << endl << endl;
+							armoredzombie1 -= num;
+						}
+						break;
+					case 2:
+						if (health < 20 && DWactive == true) {
+							cout << "You passed out for a second but the Dying Wish saved you!" << endl << endl;
+							if (JGactive) {
+								health = 250;
+								DWactive = false;
+								perks[2] = " ";
+							}
+							else
+								health = 150;
+							DWactive = false;
+							perks[2] = " ";
+						}
+						else if (JGactive == true && inventory[3] == "stim") {
+							cout << "you inject the stim and get health!" << endl << endl;
+							health = 250;
+							inventory[3] = " ";
+						}
+						else if (inventory[3] == "stim") {
+							cout << "you inject the stim and get health!" << endl << endl;
+							health = 150;
+							inventory[3] = " "; // erases stim
+						}
+						else cout << "you dont have a stim equipped" << endl << endl;
+						break;
+
+
+
+					}
+					input = 9;
+					cout << "your health:" << health << endl << endl;
+					cout << "the zombies health is:" << armoredzombie1 << endl << endl;
+				}
+
+			}
+		}
 	}
+	done = "quit";
+	cout << "-------------------------------------------------------------------------------------" << endl << endl;
+	cout << "YOU WON!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
+	cout << "" << endl<<endl<<endl;
 }
 
 
@@ -569,7 +2672,7 @@ void ClosetBattle() {
 			cout << "you get hit by zombie for " << num << " damage" << endl << endl;
 			health -= num;
 
-			cout << "press 1 to attack, 2 to drink potion" << endl << endl;
+			cout << "press 1 to attack, 2 to inject stim" << endl << endl;
 			cin >> input;
 
 			switch (input) {
@@ -579,9 +2682,13 @@ void ClosetBattle() {
 					cout << "You passed out for a second but the Dying Wish saved you!" << endl << endl;
 					if (JGactive) {
 						health = 250;
+						DWactive = false;
+						perks[2] = " ";
 					}
 					else
 						health = 150;
+					DWactive = false;
+					perks[2] = " ";
 				}
 				else if (inventory[1] == "Caliburn sword" && DHactive == true) {
 					num = rand() % 13 + 15; // range from 13-28
@@ -632,7 +2739,7 @@ void ClosetBattle() {
 			case 2:
 				if (JGactive == true && inventory[3] == "stim") {
 					cout << "you inject the stim and get health!" << endl << endl;
-					health = 250;
+					health = 200;
 					inventory[3] = " ";
 				}
 				else if (inventory[3] == "stim") {

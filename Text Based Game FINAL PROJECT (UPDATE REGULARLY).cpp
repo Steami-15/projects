@@ -39,7 +39,7 @@ int main() {
 	bool grabcoins = false;
 	bool neighbor = false;
 
-	while (done != "quit" && input != "quit" && 0 < health) {
+	while (done != "quit" && input != "quit" && health > 0) {
 
 		cout << endl << "--------------" << endl;
 		cout << "your inventory: ";
@@ -221,6 +221,7 @@ int main() {
 				room = 11;
 		}
 
+
 	}
 	cout << "thanks for playing!" << endl;
 }
@@ -375,7 +376,7 @@ void Horde() {
 	int armoredzombie1 = 60;
 	int input;
 	int num;
-	
+
 
 	cout << endl << endl << "--------------------------------" << endl << endl;
 	while (health > 0 && zombie1 > 0) {
@@ -2191,7 +2192,7 @@ void Horde() {
 						else if (inventory[1] == "Electric sword" && DHactive == true) {
 							num = rand() % 13 + 15; // range from 10-20
 							cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
-							zombie9-= num;
+							zombie9 -= num;
 						}
 						else if (inventory[1] == "Electric sword") {
 							num = rand() % 10 + 10; // range from 10-20
@@ -2656,11 +2657,20 @@ void Horde() {
 			}
 		}
 	}
-	system("color 0f");
-	done = "quit";
-	cout << "-------------------------------------------------------------------------------------" << endl << endl;
-	cout << "YOU WON!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
-	cout << "" << endl<<endl<<endl;
+	if (health > 0) {
+		system("color 0f");
+		done = "quit";
+		cout << "-------------------------------------------------------------------------------------" << endl << endl;
+		cout << "YOU WON!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
+		cout << "" << endl << endl << endl;
+	}
+	else if (health < 0) {
+		system("color 0f");
+		done = "quit";
+		cout << "-------------------------------------------------------------------------------------" << endl << endl;
+		cout << "your lost your trash" << endl;
+		cout << "" << endl << endl << endl;
+	}
 }
 
 
@@ -2679,7 +2689,7 @@ void ClosetBattle() {
 			num = rand() % 10 + 10; // range from 10-20
 			cout << "you get hit by zombie for " << num << " damage (reduced because of armor)" << endl << endl;
 			health -= num;
-			
+
 
 			cout << "press 1 to attack, 2 to inject stim" << endl << endl;
 			cin >> input;
@@ -2687,7 +2697,7 @@ void ClosetBattle() {
 			switch (input) {
 			case 1:
 				//player attack
-				if (health < 10 && DWactive == true) {
+				if (health < 20 && DWactive == true) {
 					cout << "You passed out for a second but the Dying Wish saved you!" << endl << endl;
 					if (JGactive) {
 						health = 250;
@@ -2763,6 +2773,7 @@ void ClosetBattle() {
 			}
 			cout << "your health:" << health << endl << endl;
 			cout << "the zombies health is:" << zombie1 << endl << endl;
+
 		}
 		else {
 			num = rand() % 30 + 10; // range from 30-40
@@ -2853,20 +2864,30 @@ void ClosetBattle() {
 			cout << "the zombies health is:" << zombie1 << endl << endl;
 
 		}
+
 	}
-	system("color 0f");
-	cout << "       _______________        " << endl;
-	cout << "      /               \\      " << endl;
-	cout << "      |  __      __   |" << endl;
-	cout << "      |  |_|     |_|  |" << endl;
-	cout << "      |               |" << endl;
-	cout << "      |               |" << endl;
-	cout << "      |               |" << endl;
-	cout << "      |   \\\\_____//   |" << endl;
-	cout << "      |   //     \\\\   |" << endl;
-	cout << "      \\______________/" << endl;
-	cout << "end of battle------------------------" << endl << endl;
-	zombiedead = true;
+	if (health > 0) {
+		system("color 0f");
+		cout << "       _______________        " << endl;
+		cout << "      /               \\      " << endl;
+		cout << "      |  __      __   |" << endl;
+		cout << "      |  |_|     |_|  |" << endl;
+		cout << "      |               |" << endl;
+		cout << "      |               |" << endl;
+		cout << "      |               |" << endl;
+		cout << "      |   \\\\_____//   |" << endl;
+		cout << "      |   //     \\\\   |" << endl;
+		cout << "      \\______________/" << endl;
+		cout << "end of battle------------------------" << endl << endl;
+		zombiedead = true;
+	}
+	else if (health < 0) {
+		system("color 0f");
+		done = "quit";
+		cout << "-------------------------------------------------------------------------------------" << endl << endl;
+		cout << "YOU DIED" << endl;
+		cout << "" << endl << endl << endl;
+	}
 }
 
 void neighborzombie() {
@@ -2884,7 +2905,7 @@ void neighborzombie() {
 			cout << "you get hit by your neighbor for " << num << " damage (reduced because of armor)" << endl << endl;
 
 			health -= num;
-			
+
 
 			cout << "press 1 to attack, 2 to inject stim" << endl << endl;
 			cin >> input;
@@ -2974,7 +2995,7 @@ void neighborzombie() {
 			num = rand() % 30 + 10; // range from 30-40
 			cout << "you get hit by your neighbor for " << num << " damage" << endl << endl;
 			health -= num;
-			
+
 
 			cout << "press 1 to attack, 2 to inject stim" << endl << endl;
 			cin >> input;
@@ -3061,17 +3082,26 @@ void neighborzombie() {
 
 		}
 	}
-	system("color 0f");
-	cout << "       _______________        " << endl;
-	cout << "      /               \\      " << endl;
-	cout << "      |  __      __   |" << endl;
-	cout << "      |  |_|     |_|  |" << endl;
-	cout << "      |               |" << endl;
-	cout << "      |               |" << endl;
-	cout << "      |               |" << endl;
-	cout << "      |   \\\\_____//   |" << endl;
-	cout << "      |   //     \\\\   |" << endl;
-	cout << "      \\______________/" << endl;
-	cout << "end of battle------------------------" << endl << endl;
-	neighbordead = true;
+	if (health > 0) {
+		system("color 0f");
+		cout << "       _______________        " << endl;
+		cout << "      /               \\      " << endl;
+		cout << "      |  __      __   |" << endl;
+		cout << "      |  |_|     |_|  |" << endl;
+		cout << "      |               |" << endl;
+		cout << "      |               |" << endl;
+		cout << "      |               |" << endl;
+		cout << "      |   \\\\_____//   |" << endl;
+		cout << "      |   //     \\\\   |" << endl;
+		cout << "      \\______________/" << endl;
+		cout << "end of battle------------------------" << endl << endl;
+		neighbordead = true;
+	}
+	else if (health < 0) {
+		system("color 0f");
+		done = "quit";
+		cout << "-------------------------------------------------------------------------------------" << endl << endl;
+		cout << "YOU DIED" << endl;
+		cout << "" << endl << endl << endl;
+	}
 }

@@ -1,6 +1,7 @@
 #include<iostream>
 #include<string>
 #include<Windows.h>
+#pragma comment(lib, "winmm.lib")
 using namespace std;
 
 void ClosetBattle(); //Battle that distracts the player and wastes time
@@ -22,6 +23,8 @@ bool JGactive = false;
 bool DHactive = false;
 
 bool DWactive = false;
+
+void neighborzombie();
 
 void Horde();
 
@@ -174,6 +177,7 @@ int main() {
 				cout << "thats not an option" << endl;
 			break;
 		case 9:
+			neighborzombie();
 			if (neighbor == false) {
 				cout << "you found some coins on the floor!" << endl;
 				coins += 10;
@@ -231,11 +235,13 @@ void PerkShop() {
 	cout << "SHOP" << endl;
 	cout << "your coins: " << coins << endl << endl;
 	while (input != 'q') {
+		system("color 1f");
 		cout << "type j for JuggerNog(20$), d for Dying Wish(10$), r for Double Hit Root Beer(10$), q to leave shop" << endl;
 		cin >> input;
 		switch (input) {
 		case 'j':
 			if (JGactive == false && coins >= 20) {
+				PlaySound(TEXT("juggernog.wav"), NULL, SND_FILENAME);
 				cout << "you have the JuggerNog Perk!" << endl;
 				perks[0] = "JuggerNog";
 				juggernog();
@@ -250,6 +256,7 @@ void PerkShop() {
 			break;
 		case 'd':
 			if (DWactive == false && coins >= 10) {
+				PlaySound(TEXT("quickrevive.wav"), NULL, SND_FILENAME);
 				cout << "you have the Dying Wish Perk!" << endl;
 				perks[2] = "DyingWish";
 				DWactive = true;
@@ -263,6 +270,7 @@ void PerkShop() {
 			break;
 		case 'r':
 			if (DHactive == false && coins >= 10) {
+				PlaySound(TEXT("doubletap.wav"), NULL, SND_FILENAME);
 				cout << "you got Double Hit Root Beer!" << endl;
 				perks[1] = "DoubleHit";
 				DHactive = true;
@@ -276,6 +284,7 @@ void PerkShop() {
 			break;
 		}
 	}
+	system("color 0f");
 	cout << endl << "----------------------" << endl;
 
 }
@@ -287,6 +296,7 @@ void shop() {
 	cout << "your coins: " << coins << endl << endl;
 
 	while (input != 'q') {
+		system("color 1f");
 		cout << "Type p for stim(10$), f for Fire sword(20$), e for Electric sword(20$), v for Void sword aka the most powerful(30$), l for Light sword(20$), a for armor(10$), q to leave shop" << endl;
 		cin >> input;
 		switch (input) {
@@ -346,6 +356,7 @@ void shop() {
 			break;
 		}
 	}
+	system("color 0f");
 	cout << endl << "----------------------" << endl;
 }
 
@@ -368,7 +379,7 @@ void Horde() {
 
 	cout << endl << endl << "--------------------------------" << endl << endl;
 	while (health > 0 && zombie1 > 0) {
-		
+		system("color 4f");
 
 		//monster attack
 		if (inventory[0] == "armor") {
@@ -2645,6 +2656,7 @@ void Horde() {
 			}
 		}
 	}
+	system("color 0f");
 	done = "quit";
 	cout << "-------------------------------------------------------------------------------------" << endl << endl;
 	cout << "YOU WON!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
@@ -2660,12 +2672,97 @@ void ClosetBattle() {
 	int num;
 	cout << endl << endl << "-----------" << endl;
 	while (zombiedead == false && health > 0 && zombie1 > 0) {
-
+		system("color 4f");
+		PlaySound(TEXT("growl.wav"), NULL, SND_FILENAME);
 		//monster attack
 		if (inventory[1] == "armor") {
 			num = rand() % 10 + 10; // range from 10-20
 			cout << "you get hit by zombie for " << num << " damage (reduced because of armor)" << endl << endl;
 			health -= num;
+			
+
+			cout << "press 1 to attack, 2 to inject stim" << endl << endl;
+			cin >> input;
+
+			switch (input) {
+			case 1:
+				//player attack
+				if (health < 10 && DWactive == true) {
+					cout << "You passed out for a second but the Dying Wish saved you!" << endl << endl;
+					if (JGactive) {
+						health = 250;
+						DWactive = false;
+						perks[2] = " ";
+					}
+					else
+						health = 150;
+					DWactive = false;
+					perks[2] = " ";
+				}
+				else if (inventory[1] == "Caliburn sword" && DHactive == true) {
+					num = rand() % 13 + 15; // range from 13-28
+					cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+					zombie1 -= num;
+				}
+				else if (inventory[1] == "Caliburn sword") {
+					num = rand() % 10 + 10; // range from 10-20
+					cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+					zombie1 -= num;
+				}
+				else if (inventory[1] == "Solais sword" && DHactive == true) {
+					num = rand() % 13 + 15; // range from 10-20
+					cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+					zombie1 -= num;
+				}
+				else if (inventory[1] == "Solais sword") {
+					num = rand() % 10 + 10; // range from 10-20
+					cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+					zombie1 -= num;
+				}
+				else if (inventory[1] == "Balmung sword" && DHactive == true) {
+					num = rand() % 15 + 18; // range from 15-32
+					cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+					zombie1 -= num;
+				}
+				else if (inventory[1] == "Balmung sword") {
+					num = rand() % 13 + 15; // range from 13-28
+					cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+					zombie1 -= num;
+				}
+				else if (inventory[1] == "Durendal sword" && DHactive == true) {
+					num = rand() % 13 + 15; // range from 13-28
+					cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+					zombie1 -= num;
+				}
+				else if (inventory[1] == "Durendal sword") {
+					num = rand() % 10 + 10; // range from 10-20
+					cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+					zombie1 -= num;
+				}
+				else {
+					num = rand() % 5 + 3;
+					cout << "you punch the zombie for" << num << " damage" << endl << endl;
+					zombie1 -= num;
+				}
+				break;
+			case 2:
+				if (JGactive == true && inventory[3] == "stim") {
+					cout << "you inject the stim and get health!" << endl << endl;
+					health = 200;
+					inventory[3] = " ";
+				}
+				else if (inventory[3] == "stim") {
+					cout << "you inject the stim and get health!" << endl << endl;
+					health = 150;
+					inventory[3] = " "; // erases stim
+				}
+				else {
+					cout << "you dont have a stim equipped" << endl << endl;
+				}
+				break;
+			}
+			cout << "your health:" << health << endl << endl;
+			cout << "the zombies health is:" << zombie1 << endl << endl;
 		}
 		else {
 			num = rand() % 30 + 10; // range from 30-40
@@ -2757,6 +2854,7 @@ void ClosetBattle() {
 
 		}
 	}
+	system("color 0f");
 	cout << "       _______________        " << endl;
 	cout << "      /               \\      " << endl;
 	cout << "      |  __      __   |" << endl;
@@ -2769,4 +2867,211 @@ void ClosetBattle() {
 	cout << "      \\______________/" << endl;
 	cout << "end of battle------------------------" << endl << endl;
 	zombiedead = true;
+}
+
+void neighborzombie() {
+	int zombie1 = 10;
+	bool neighbordead = false;
+	int input;
+	int num;
+	cout << endl << endl << "-----------" << endl;
+	while (neighbordead == false && health > 0 && zombie1 > 0) {
+		system("color 4f");
+		PlaySound(TEXT("growl.wav"), NULL, SND_FILENAME);
+		//monster attack
+		if (inventory[1] == "armor") {
+			num = rand() % 10 + 10; // range from 10-20
+			cout << "you get hit by your neighbor for " << num << " damage (reduced because of armor)" << endl << endl;
+
+			health -= num;
+			
+
+			cout << "press 1 to attack, 2 to inject stim" << endl << endl;
+			cin >> input;
+
+			switch (input) {
+			case 1:
+				//player attack
+				if (health < 10 && DWactive == true) {
+					cout << "You passed out for a second but the Dying Wish saved you!" << endl << endl;
+					if (JGactive) {
+						health = 250;
+						DWactive = false;
+						perks[2] = " ";
+					}
+					else
+						health = 150;
+					DWactive = false;
+					perks[2] = " ";
+				}
+				else if (inventory[1] == "Caliburn sword" && DHactive == true) {
+					num = rand() % 13 + 15; // range from 13-28
+					cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+					zombie1 -= num;
+				}
+				else if (inventory[1] == "Caliburn sword") {
+					num = rand() % 10 + 10; // range from 10-20
+					cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+					zombie1 -= num;
+				}
+				else if (inventory[1] == "Solais sword" && DHactive == true) {
+					num = rand() % 13 + 15; // range from 10-20
+					cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+					zombie1 -= num;
+				}
+				else if (inventory[1] == "Solais sword") {
+					num = rand() % 10 + 10; // range from 10-20
+					cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+					zombie1 -= num;
+				}
+				else if (inventory[1] == "Balmung sword" && DHactive == true) {
+					num = rand() % 15 + 18; // range from 15-32
+					cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+					zombie1 -= num;
+				}
+				else if (inventory[1] == "Balmung sword") {
+					num = rand() % 13 + 15; // range from 13-28
+					cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+					zombie1 -= num;
+				}
+				else if (inventory[1] == "Durendal sword" && DHactive == true) {
+					num = rand() % 13 + 15; // range from 13-28
+					cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+					zombie1 -= num;
+				}
+				else if (inventory[1] == "Durendal sword") {
+					num = rand() % 10 + 10; // range from 10-20
+					cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+					zombie1 -= num;
+				}
+				else {
+					num = rand() % 5 + 3;
+					cout << "you punch the zombie for" << num << " damage" << endl << endl;
+					zombie1 -= num;
+				}
+				break;
+			case 2:
+				if (JGactive == true && inventory[3] == "stim") {
+					cout << "you inject the stim and get health!" << endl << endl;
+					health = 200;
+					inventory[3] = " ";
+				}
+				else if (inventory[3] == "stim") {
+					cout << "you inject the stim and get health!" << endl << endl;
+					health = 150;
+					inventory[3] = " "; // erases stim
+				}
+				else {
+					cout << "you dont have a stim equipped" << endl << endl;
+				}
+				break;
+			}
+			cout << "your health:" << health << endl << endl;
+			cout << "the zombies health is:" << zombie1 << endl << endl;
+		}
+
+		else {
+			num = rand() % 30 + 10; // range from 30-40
+			cout << "you get hit by your neighbor for " << num << " damage" << endl << endl;
+			health -= num;
+			
+
+			cout << "press 1 to attack, 2 to inject stim" << endl << endl;
+			cin >> input;
+
+			switch (input) {
+			case 1:
+				//player attack
+				if (health < 10 && DWactive == true) {
+					cout << "You passed out for a second but the Dying Wish saved you!" << endl << endl;
+					if (JGactive) {
+						health = 250;
+						DWactive = false;
+						perks[2] = " ";
+					}
+					else
+						health = 150;
+					DWactive = false;
+					perks[2] = " ";
+				}
+				else if (inventory[1] == "Caliburn sword" && DHactive == true) {
+					num = rand() % 13 + 15; // range from 13-28
+					cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+					zombie1 -= num;
+				}
+				else if (inventory[1] == "Caliburn sword") {
+					num = rand() % 10 + 10; // range from 10-20
+					cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+					zombie1 -= num;
+				}
+				else if (inventory[1] == "Solais sword" && DHactive == true) {
+					num = rand() % 13 + 15; // range from 10-20
+					cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+					zombie1 -= num;
+				}
+				else if (inventory[1] == "Solais sword") {
+					num = rand() % 10 + 10; // range from 10-20
+					cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+					zombie1 -= num;
+				}
+				else if (inventory[1] == "Balmung sword" && DHactive == true) {
+					num = rand() % 15 + 18; // range from 15-32
+					cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+					zombie1 -= num;
+				}
+				else if (inventory[1] == "Balmung sword") {
+					num = rand() % 13 + 15; // range from 13-28
+					cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+					zombie1 -= num;
+				}
+				else if (inventory[1] == "Durendal sword" && DHactive == true) {
+					num = rand() % 13 + 15; // range from 13-28
+					cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+					zombie1 -= num;
+				}
+				else if (inventory[1] == "Durendal sword") {
+					num = rand() % 10 + 10; // range from 10-20
+					cout << "you hit the zombie with your sword for" << num << " damage" << endl << endl;
+					zombie1 -= num;
+				}
+				else {
+					num = rand() % 5 + 3;
+					cout << "you punch the zombie for" << num << " damage" << endl << endl;
+					zombie1 -= num;
+				}
+				break;
+			case 2:
+				if (JGactive == true && inventory[3] == "stim") {
+					cout << "you inject the stim and get health!" << endl << endl;
+					health = 200;
+					inventory[3] = " ";
+				}
+				else if (inventory[3] == "stim") {
+					cout << "you inject the stim and get health!" << endl << endl;
+					health = 150;
+					inventory[3] = " "; // erases stim
+				}
+				else {
+					cout << "you dont have a stim equipped" << endl << endl;
+				}
+				break;
+			}
+			cout << "your health:" << health << endl << endl;
+			cout << "the zombies health is:" << zombie1 << endl << endl;
+
+		}
+	}
+	system("color 0f");
+	cout << "       _______________        " << endl;
+	cout << "      /               \\      " << endl;
+	cout << "      |  __      __   |" << endl;
+	cout << "      |  |_|     |_|  |" << endl;
+	cout << "      |               |" << endl;
+	cout << "      |               |" << endl;
+	cout << "      |               |" << endl;
+	cout << "      |   \\\\_____//   |" << endl;
+	cout << "      |   //     \\\\   |" << endl;
+	cout << "      \\______________/" << endl;
+	cout << "end of battle------------------------" << endl << endl;
+	neighbordead = true;
 }
